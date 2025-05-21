@@ -3,7 +3,7 @@
 ## Sending message from clients
 ![Sending message from clients](./send_msg.png)
 
-### How to run it
+### 2.1 How to run it
 #### * Running the Server
 ```bash
 cargo run --bin server
@@ -25,7 +25,7 @@ When you type a message in any client:
 2. The server receives the message and broadcasts it to all connected clients
 Every client (including the sender) displays the message prefixed with "From server:"
 
-## Modifying Port
+## 2.2 Modifying Port
 
 ### Only changing the client port
 ![Client server different port](./client_server_diff_port.png)
@@ -43,4 +43,10 @@ let listener = TcpListener::bind("127.0.0.1:7000").await?;
 println!("listening on port 7000");
 ```
 After changing the server port from `2000` to `7000`, the client was able to reconnect with the server as before. However, unlike the client which uses the `websocket` protocol to connect to the server, the server only listens for TCP connections on port `7000`, where the incoming connection is then upgraded to a `websocket` stream through code.
+
+## 2.3  Small changes, add IP and Port
+
+![Add sender info](./add_sender_info.png)
+
+It can be seen from the image above that each broadcast from the server now includes information about which client sent the message. I was able to achieve this by modifying a section of code in `src/bin/server.rs`, specifically the part responsible for sending messages to all connected clients. I changed the line `bcast_tx.send(text.into())?;` to `bcast_tx.send(format!("{addr:?}: {text:?}"))?;`. With this change, whenever a client sends a message, the server will broadcast that message along with information indicating which client sent it.
 
